@@ -98,7 +98,7 @@ install_dist() {
 ## update_dist: Updates a dist using git.
 update_dist() {
   DIST=$1
-  [ ! -d "$DIST"] && die "No $DIST installation found."
+  [ ! -d "$DIST" ] && die "No $DIST installation found."
   pushd $DIST
   git pull
   BUILD="build_$DIST"
@@ -109,7 +109,7 @@ update_dist() {
 ## reinstall_dist: Removes an existing install, and runs install_dist again.
 reinstall_dist() {
   DIST=$1
-  [ -d "$DIST"] && rm -rf "$DIST"
+  [ -d "$DIST" ] && rm -rf "$DIST"
   INSTDIST="install_$DIST"
   $INSTDIST
 }
