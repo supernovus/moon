@@ -376,7 +376,7 @@ case "$MYFUNC" in
     refresh_modules
   ;;
   rebuild)
-    [ $# -lt 2] && show_usage
+    [ $# -lt 2 ] && show_usage
     MYLIST="$2"
     [ ! -f "$MYLIST" ] && die "no such file '$MYLIST'"
     rebuild_list $MYLIST
