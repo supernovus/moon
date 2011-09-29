@@ -378,7 +378,7 @@ case "$MYFUNC" in
   rebuild)
     [ $# -lt 2 ] && usage "No list specified"
     MYLIST="$2"
-    [ ! -f "$MYLIST" ] && die "no such file '$MYLIST'"
+    [ ! -f "$MYLIST" ] && die "No such file '$MYLIST'."
     rebuild_list $MYLIST
   ;;
   apt-get-deps)
