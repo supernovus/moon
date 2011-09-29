@@ -86,6 +86,20 @@ die() {
   exit 1
 }
 
+## call_function: Call a given function on a given dist.
+call_function() {
+  MYFUNC=$1
+  MYDIST=$2
+  MYPREP="prep_$MYDIST"
+  $MYPREP
+  if [ "$MYFUNC" == "auto" ]; then
+    auto_dist $MYDIST
+  else
+    MYCALL="${MYFUNC}_${MYDIST}"
+    $MYCALL
+  fi
+}
+
 ## install_dist: Installs a dist using git.
 install_dist() {
   DIST=$1
@@ -132,10 +146,7 @@ auto_dist() {
 need() {
   DIST=$1
   if [ ! -d "$DIST" ]; then
-    PREP="prep_$DIST"
-    $PREP
-    INSTDIST="install_$DIST"
-    $INSTDIST
+    call_function install $DIST
   fi
 }
 
@@ -335,20 +346,6 @@ rebuild_list() {
 ## This totally depends on being a recent version of Debian or Ubuntu.
 apt_get_moon_deps() {
   sudo apt-get install libicu-dev libreadline6-dev libperl-dev
-}
-
-## call_function: Call a given function on a given dist.
-call_function() {
-  MYFUNC=$1
-  MYDIST=$2
-  MYPREP="prep_$MYDIST"
-  $MYPREP
-  if [ "$MYFUNC" == "auto" ]; then
-    auto_dist $MYDIST
-  else
-    MYCALL="${MYFUNC}_${MYDIST}"
-    $MYCALL
-  fi
 }
 
 ## The defaults
