@@ -132,8 +132,8 @@ show_help() {
 }
 
 ## Show a usage message
-show_usage() {
-	die "Sorry, that's not valid. Type '$0 help' for usage details."
+usage() {
+	die "$1. Type '$0 help' for usage details."
 }
 
 #### ( Initialize ) ####
@@ -349,13 +349,13 @@ call_everything() {
 
 #### ( Process the commands ) ####
 
-[ $# -lt 1 ] && show_usage
+[ $# -lt 1 ] && usage "Not enough parameters"
 
 MYFUNC="$1"
 
 case "$MYFUNC" in
   install|update|reinstall|clean)
-    [ $# -lt 2 ] && show_usage
+    [ $# -lt 2 ] && usage "No dist specified"
     MYDIST="$2"
     case "$MYDIST" in
       rakudo|panda|ufo|blizkost|zavolaj)
@@ -368,7 +368,7 @@ case "$MYFUNC" in
         call_everything $MYFUNC
       ;;
       *)
-        show_usage
+        usage "Unknown dist"
       ;;
     esac
   ;;
@@ -376,7 +376,7 @@ case "$MYFUNC" in
     refresh_modules
   ;;
   rebuild)
-    [ $# -lt 2 ] && show_usage
+    [ $# -lt 2 ] && usage "No list specified"
     MYLIST="$2"
     [ ! -f "$MYLIST" ] && die "no such file '$MYLIST'"
     rebuild_list $MYLIST
@@ -388,7 +388,7 @@ case "$MYFUNC" in
 		show_help
 	;;
   *)
-    show_usage
+    usage "Unknown command"
   ;;
 esac
 
