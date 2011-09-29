@@ -341,6 +341,8 @@ apt_get_moon_deps() {
 call_function() {
   MYFUNC=$1
   MYDIST=$2
+  MYPREP="prep_$MYDIST"
+  $MYPREP
   if [ "$MYFUNC" == "auto" ]; then
     auto_dist $MYDIST
   else
