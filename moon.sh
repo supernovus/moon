@@ -48,7 +48,7 @@
 #                           make install
 #                         You must have 'ufo' installed, if it isn't found,
 #                         it will be installed using 'panda'. If panda isn't
-#                         installed, it will fail with an error message.
+#                         found, it will be installed.
 #
 #   apt-get-deps          On Debian or Ubuntu, use "sudo apt-get" to install
 #                         the dependencies listed above.
@@ -61,8 +61,8 @@
 #   blizkost             The Blizkost Perl 5 engine (requires rakudo.)
 #   zavolaj              The NativeCall library (requires panda.)
 #
-#   default              Installs rakudo, panda and ufo.
-#   all                  Installs all known dists.
+#   default              Installs rakudo and panda.
+#   all                  Installs all of the above dists.
 #
 ###############################################################################
 
@@ -147,6 +147,20 @@ need() {
   DIST=$1
   if [ ! -d "$DIST" ]; then
     call_function install $DIST
+  fi
+}
+
+## need_panda: Ensure a dist is installed via panda. If it isn't, install it.
+need_panda() {
+  MYDIST=$1
+  if [ $# -gt 1 ]; then
+    MYPKG=$2
+  else
+    MYPKG=$1
+  fi
+  grep -E "^$MYPKG" ~/.panda/state >/dev/null 2>&1
+  if [ $? -ne 0 ]; then
+    call_function install $MYDIST
   fi
 }
 
@@ -324,7 +338,7 @@ refresh_modules() {
   timestamp=`date +%s`
   [ -e "~/.perl6" ] && mv -v ~/.perl6 ~/.perl6-$timestamp
   [ -e "~/.panda" ] && mv -v ~/.panda ~/.panda-$timestamp
-  install_panda ## Reinstall panda, ensuring a proper bootstrap.
+  call_function install panda
   if [ -e "~/.panda-$timestamp" ]; then
     for pkg in `grep -E 'installed$' ~/.panda-$timestamp/state | sed -e 's/ installed//g' | grep -v panda`; do
       panda install $pkg
@@ -332,8 +346,11 @@ refresh_modules() {
   fi
 }
 
+## Rebuild projects. Uses ufo. Will auto-install it if needed.
 rebuild_list() {
   LIST=$1
+  need panda
+  need_panda ufo
   for dir in `cat $LIST`; do
     pushd $dir
     make clean
@@ -349,17 +366,17 @@ apt_get_moon_deps() {
 }
 
 ## The defaults
-call_defaults() {
+call_default() {
   MYFUNC=$1
   call_function $MYFUNC rakudo
   call_function $MYFUNC panda
-  call_function $MYFUNC ufo
 }
 
 ## Everything
 call_everything() {
   MYFUNC=$1
-  call_defaults $MYFUNC
+  call_default $MYFUNC
+  call_function $MYFUNC ufo
   call_function $MYFUNC blizkost
   call_function $MYFUNC zavolaj
 } 
