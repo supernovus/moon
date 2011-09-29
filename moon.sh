@@ -34,6 +34,9 @@
 #   clean     <dist>      Cleans an installed dist, sometimes needed.
 #   reinstall <dist>      Wipes out an existing dist, and does install again.
 #
+#   <dist>                Use a dist name by itself, and if it is installed
+#                         it will be upgraded, otherwise it will be installed.
+#
 #   refresh-modules       Wipes out your existing ~/.perl6 and ~/.panda folders
 #                         and re-installs any libraries you had installed
 #                         using panda.
@@ -59,7 +62,7 @@
 #   zavolaj              The NativeCall library (requires panda.)
 #
 #   default              Installs rakudo, panda and ufo.
-#   all                  Installs all known profiles.
+#   all                  Installs all known dists.
 #
 ###############################################################################
 
@@ -114,6 +117,17 @@ reinstall_dist() {
   $INSTDIST
 }
 
+## auto_dist: Installs or updates depending on existence.
+auto_dist() {
+  DIST=$1
+  if [ -d "$DIST" ]; then
+    DOCMD="update_$DIST"
+  else
+    DOCMD="install_$DIST"
+  fi
+  $DOCMD
+}
+
 ## need: Ensure a dist is installed, if it isn't, install it.
 need() {
   DIST=$1
@@ -127,7 +141,7 @@ need() {
 
 ## Spit out a help message
 show_help() {
-	sed -n -e '22,63s/^#//gp' $0 | less
+	sed -n -e '22,66s/^#//gp' $0 | less
 	exit 1
 }
 
@@ -327,8 +341,12 @@ apt_get_moon_deps() {
 call_function() {
   MYFUNC=$1
   MYDIST=$2
-  MYCALL="${MYFUNC}_${MYDIST}"
-  $MYCALL
+  if [ "$MYFUNC" == "auto" ]; then
+    auto_dist $MYDIST
+  else
+    MYCALL="${MYFUNC}_${MYDIST}"
+    $MYCALL
+  fi
 }
 
 ## The defaults
@@ -371,6 +389,15 @@ case "$MYFUNC" in
         usage "Unknown dist"
       ;;
     esac
+  ;;
+  rakudo|panda|ufo|blizkost|zavolaj)
+    call_function auto $MYFUNC
+  ;;
+  default)
+    call_default auto
+  ;;
+  all)
+    call_everything auto
   ;;
   refresh-modules)
     refresh_modules
