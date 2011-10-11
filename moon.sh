@@ -53,6 +53,10 @@
 #   apt-get-deps          On Debian or Ubuntu, use "sudo apt-get" to install
 #                         the dependencies listed above.
 #
+#   switch <branch>       Specific to rakudo, this switches between different
+#                         branches, keeping each one in its own folder, so the
+#                         installations will remain separate.
+#
 # Dists:
 #
 #   rakudo               Rakudo Perl 6, including Parrot and NQP.
@@ -195,12 +199,44 @@ build_rakudo() {
   make && make install
 }
 
-install_rakudo() {
-  install_dist rakudo $RAKUDO_GIT
+link_rakudo_bin() {
   if [ ! -e "./bin" ]; then
-    ln -sv ./rakudo/install/bin .
+    if [ -e "./rakudo/install/bin" ]; then 
+      ln -sv ./rakudo/install/bin .
+    elif [ -e "./rakudo/parrot_install/bin" ]; then
+      ln -sv ./rakudo/parrot_install/bin .
+    else
+      die "No install path found, cannot continue!"
+    fi
     add_path "$P6DIR/bin"
   fi
+}
+
+switch_rakudo() {
+  pushd rakudo
+  FROMVER=`git branch | grep '*' | sed -e 's/*\s//g'`
+  popd
+  TOVER=$1
+  NEEDINSTALL=0
+  if [ ! -d "rakudo-$TOVER" ]; then
+    NEEDINSTALL=1
+    git clone rakudo rakudo-$TOVER
+    pushd rakudo-$TOVER
+    git checkout $TOVER
+    popd
+  fi
+  mv -v rakudo rakudo-$FROMVER
+  mv -v rakudo-$TOVER rakudo
+  rm -v bin
+  link_rakudo_bin
+  if [ "$NEEDINSTALL" == "1" ]; then
+    update_dist rakudo
+  fi
+}
+
+install_rakudo() {
+  install_dist rakudo $RAKUDO_GIT
+  link_rakudo_bin
 }
 
 update_rakudo() {
@@ -426,6 +462,10 @@ case "$MYFUNC" in
   ;;
   apt-get-deps)
     apt_get_moon_deps
+  ;;
+  switch)
+    [ $# -lt 2 ] && usage "No branch specified"
+    switch_rakudo $2
   ;;
 	help|--help)
 		show_help
