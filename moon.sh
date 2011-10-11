@@ -217,6 +217,7 @@ switch_rakudo() {
   FROMVER=`git branch | grep '*' | sed -e 's/*\s//g'`
   popd
   TOVER=$1
+  [ "$FROMVER" = "$TOVER" ] && die "Attempt to switch to current branch."
   NEEDINSTALL=0
   if [ ! -d "rakudo-$TOVER" ]; then
     NEEDINSTALL=1
