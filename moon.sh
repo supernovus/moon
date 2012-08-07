@@ -170,7 +170,7 @@ need_panda() {
 
 ## Spit out a help message
 show_help() {
-	sed -n -e '22,66s/^#//gp' $0 | less
+	sed -n -e '22,70s/^#//gp' $0 | less
 	exit 1
 }
 
@@ -272,7 +272,7 @@ prep_panda() {
 }
 
 build_panda() {
-  bash ./bootstrap.sh
+  perl6 ./bootstrap.pl
 }
 
 install_panda() {
