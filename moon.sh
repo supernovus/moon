@@ -41,16 +41,14 @@
 #                         and re-installs any libraries you had installed
 #                         using panda.
 # 
-#   rebuild <list>        A list of folders containing Perl 6 projects.
-#                         It goes into the folder and does:
-#                           make clean
-#                           ufo
-#                           make install
-#                         You must have 'ufo' installed, if it isn't found,
-#                         it will be installed using 'panda'. If panda isn't
-#                         found, it will be installed.
+#   rebuild <list>        Use panda to install a list of projects.
+#                         Each line is either the name of a project, or
+#                         the local folder to install the project from.
 #
 #   apt-get-deps          On Debian or Ubuntu, use "sudo apt-get" to install
+#                         the dependencies listed above.
+#
+#   emerge-deps           On Gentoo or Funtoo, use "sudo emerge" to install
 #                         the dependencies listed above.
 #
 #   switch <branch>       Specific to rakudo, this switches between different
@@ -387,19 +385,19 @@ refresh_modules() {
 rebuild_list() {
   LIST=$1
   need panda
-  need_panda ufo
-  for dir in `cat $LIST`; do
-    pushd $dir
-    make clean
-    ufo
-    make install
-    popd
+  for want in `cat $LIST`; do
+    panda install $want
   done
 }
 
 ## This totally depends on being a recent version of Debian or Ubuntu.
 apt_get_moon_deps() {
   sudo apt-get install libicu-dev libreadline6-dev libperl-dev
+}
+
+## Gentoo is different, by default it has development libs.
+emerge_moon_deps() {
+  sudo emerge readline
 }
 
 ## The defaults
@@ -463,6 +461,9 @@ case "$MYFUNC" in
   ;;
   apt-get-deps)
     apt_get_moon_deps
+  ;;
+  emerge-deps)
+    emerge_moon_deps
   ;;
   switch)
     [ $# -lt 2 ] && usage "No branch specified"
