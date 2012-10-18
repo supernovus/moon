@@ -83,7 +83,7 @@ build_panda() {
 ## It is recommended that you build everything, every time.
 ## Selective builds lead to problems, so don't do it unless you know
 ## what you are doing.
-case "$1" in;
+case "$1" in
   rakudo)
     build_rakudo
   ;;
