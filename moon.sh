@@ -21,7 +21,7 @@
 
 ## The locations of our desired projects.
 RAKUDO_GIT="git://github.com/rakudo/rakudo.git"
-PANDA_GIT="git://github.com/tadzit/panda.git"
+PANDA_GIT="git://github.com/tadzik/panda.git"
 
 ## Record our own path.
 P6DIR=`pwd`
