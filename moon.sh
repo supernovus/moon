@@ -10,8 +10,8 @@
 #
 # In order to use Rakudo and Panda, you should make sure that both:
 #
-#  $P6DIR/bin
-#  ~/.perl6/bin
+#  $P6DIR/rakudo/install/bin
+#  $P6DIR/rakudo/install/lib/parrot/*/languages/perl6/site/bin
 #
 # are added to your PATH in your shell profile.
 #
@@ -35,9 +35,11 @@ add_path() {
   fi
 }
 
-## Set up our paths.
-add_path "$P6DIR/bin"
-add_path ~/.perl6/bin
+## Ensure the proper paths are in place.
+add_paths() {
+  add_path "$P6DIR/rakudo/install/bin"
+  add_path "$P6DIR/rakudo/install/lib/parrot/*/languages/perl6/site/bin"
+}
 
 ## Build Rakudo.
 build_rakudo() {
@@ -54,16 +56,11 @@ build_rakudo() {
   make && make install
 
   popd
-
-  ## Link into our "bin" folder.
-  if [ ! -e "bin" -a -e "./rakudo/install/bin" ]; then
-    ln -sv ./rakudo/install/bin .
-    add_path "$P6DIR/bin"
-  fi
 }
 
 ## Build Panda.
 build_panda() {
+  add_paths
   echo "--- Building Panda ---"
   if [ -d "panda" ]; then
     pushd panda
@@ -75,7 +72,6 @@ build_panda() {
     pushd panda
     ./bootstrap.pl
     popd
-    add_path ~/.perl6/bin
   fi
 }
 
