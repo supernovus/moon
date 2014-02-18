@@ -52,7 +52,7 @@ build_rakudo() {
     pushd rakudo
   fi
 
-  perl Configure.pl --gen-parrot
+  perl Configure.pl --gen-parrot --gen-moar --gen-nqp --backends=parrot,moar,jvm
   make && make install
 
   popd
@@ -68,7 +68,7 @@ build_panda() {
     ./rebootstrap.pl
     popd
   else
-    git clone $PANDA_GIT panda
+    git clone --recursive $PANDA_GIT panda
     pushd panda
     ./bootstrap.pl
     popd
