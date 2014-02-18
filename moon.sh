@@ -75,6 +75,7 @@ need_panda() {
   NEED_PULL=1
   if [ ! -d "panda" ]; then
     git clone --recursive $PANDA_GIT panda
+    git checkout moar-support ## remove this once merged into master.
     NEED_PULL=0
   fi
   return $NEED_PULL
