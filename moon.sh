@@ -93,7 +93,7 @@ need_panda() {
 bootstrap_panda() {
   NEED_PULL=`need_panda`
   pushd panda
-  [ $NEED_PULL -eq 1 ] && git pull
+  [ "$NEED_PULL" = "1" ] && git pull
   ./bootstrap.pl
   popd
 }
@@ -102,7 +102,7 @@ bootstrap_panda() {
 rebootstrap_panda() {
   NEED_PULL=`need_panda`
   pushd panda
-  [ $NEED_PULL -eq 1 ] && git pull
+  [ "$NEED_PULL" = "1" ] && git pull
   ./rebootstrap.pl
   popd
 }
