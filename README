@@ -1,5 +1,0 @@
-Rakudo Moon
--------------
-
-Not really a distribution per say, but a script for building Rakudo
-components from git. Read the description in moon.sh for more details.

@@ -2,12 +2,8 @@
 ###############################################################################
 # Rakudo Moon
 #
-# Build's a bleeding edge version of Rakudo Perl 6 and the Panda module
-# installer. It currently uses the MoarVM backend for Rakudo.
-#
-# TODO: redo how we support the Parrot, MoarVM and JVM backends of Rakudo, and
-# offers an easy way to switch between them. The "all or nothing" approach
-# we used previously is not flexible enough.
+# Build's a bleeding edge version of Rakudo Perl 6 on the MoarVM backend,
+# and the Panda module installer. 
 #
 # Just call it from the folder you want to build Perl 6 into (called $P6DIR)
 #
@@ -15,10 +11,6 @@
 #
 #  $P6DIR/rakudo/install/bin
 #  $P6DIR/rakudo/install/languages/perl6/site/bin
-#
-#  And if using Parrot:
-#
-#  $P6DIR/rakudo/install/lib/parrot/*/languages/perl6/site/bin
 #
 # are added to your PATH in your shell profile.
 #
@@ -46,18 +38,6 @@ add_path() {
 add_paths() {
   add_path "$P6DIR/rakudo/install/bin"
   add_path "$P6DIR/rakudo/install/languages/perl6/site/bin"
-#  add_path "$P6DIR/rakudo/install/lib/parrot/*/languages/perl6/site/bin"
-}
-
-## Switch the active "perl6" executable to one of the -p, -m, or -j versions.
-use6() {
-  P6BIN=$P6PATH/rakudo/install/bin/perl6
-  if [ ! -f $P6BIN-$1 ]; then
-    echo "invalid implementation";
-    return;
-  fi
-  rm -vf $P6BIN
-  ln -sv $P6BIN-$1 $P6BIN
 }
 
 ## Build Rakudo.
@@ -72,7 +52,6 @@ build_rakudo() {
   fi
 
   perl Configure.pl --gen-moar --backends=moar
-    #--gen-parrot --gen-moar --gen-nqp --backends=parrot,moar,jvm
   make && make install
 
   popd
@@ -83,7 +62,6 @@ need_panda() {
   NEED_PULL=1
   if [ ! -d "panda" ]; then
     git clone --recursive $PANDA_GIT panda
-#    git checkout moar-support ## remove this once merged into master.
     NEED_PULL=0
   fi
   return $NEED_PULL
@@ -118,12 +96,8 @@ Actions:
   rakudo       Build/rebuild Rakudo.
   panda        Use bootstrap on Panda.
   repanda      Use rebootstrap on Panda.
-  all          Build Rakudo and bootstrap panda for all backends.
-  reall        Same as all, but rebootstrap panda for all backends.
-
-  -p           Switch 'perl6' to Parrot backend (perl6-p).
-  -m           Switch 'perl6' to MoarVM backend (perl6-m).
-  -j           Switch 'perl6' to JVM backend    (perl6-j).
+  all          Build Rakudo and bootstrap Panda.
+  reall        Same as all, but rebootstrap Panda.
 
 EOF
   exit
@@ -143,31 +117,12 @@ case "$1" in
   all)
     build_rakudo
     add_paths
-#    use6 p
-#    boostrap_panda
-#    use6 m
-#    bootstrap_panda
-#    use6 j
     bootstrap_panda
   ;;
   reall)
     build_rakudo
     add_paths
-#    use6 p
-#    rebootstrap_panda
-#    use6 m
-#    rebootstrap_panda
-#    use6 j
     rebootstrap_panda
-  ;;
-  -p)
-    use6 p
-  ;;
-  -m)
-    use6 m
-  ;;
-  -j)
-    use6 j
   ;;
   *)
     show_help
@@ -175,3 +130,4 @@ case "$1" in
 esac
 
 echo "Build complete."
+
