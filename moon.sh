@@ -67,17 +67,9 @@ need_panda() {
   return $NEED_PULL
 }
 
-## Use the 'bootstrap' script on panda.
-bootstrap_panda() {
-  NEED_PULL=`need_panda`
-  pushd panda
-  [ "$NEED_PULL" = "1" ] && git pull
-  ./bootstrap.pl
-  popd
-}
-
 ## Use the 'rebootstrap' script on panda.
-rebootstrap_panda() {
+## We no longer use 'bootstrap' at all.
+bootstrap_panda() {
   NEED_PULL=`need_panda`
   pushd panda
   [ "$NEED_PULL" = "1" ] && git pull
@@ -94,10 +86,8 @@ usage: '$0' <action>
 Actions:
 
   rakudo       Build/rebuild Rakudo.
-  panda        Use bootstrap on Panda.
-  repanda      Use rebootstrap on Panda.
-  all          Build Rakudo and bootstrap Panda.
-  reall        Same as all, but rebootstrap Panda.
+  panda        Build/rebuild Panda.
+  all          Build/rebuild Rakudo and Panda.
 
 EOF
   exit
@@ -111,18 +101,10 @@ case "$1" in
   panda)
     bootstrap_panda
   ;;
-  repanda)
-    rebootstrap_panda
-  ;;
   all)
     build_rakudo
     add_paths
     bootstrap_panda
-  ;;
-  reall)
-    build_rakudo
-    add_paths
-    rebootstrap_panda
   ;;
   *)
     show_help
