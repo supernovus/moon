@@ -3,13 +3,14 @@
 # Rakudo Moon
 #
 # Build's a bleeding edge version of Rakudo Perl 6 on the MoarVM backend,
-# and the Panda module installer. 
+# and choices of the Panda and Zef module installers. 
 #
 # Just call it from the folder you want to build Perl 6 into (called $P6DIR)
 #
-# In order to use Rakudo and Panda, you should make sure that:
+# In order to use the binaries, you should make sure that:
 #
 #  $P6DIR/rakudo/install/bin
+#  $P6DIR/rakudo/install/share/perl6/site/bin
 #  $P6DIR/rakudo/install/languages/perl6/site/bin
 #
 # are added to your PATH in your shell profile.
@@ -21,6 +22,7 @@
 ## The locations of our desired projects.
 RAKUDO_GIT="git://github.com/rakudo/rakudo.git"
 PANDA_GIT="git://github.com/tadzik/panda.git"
+ZEF_GIT="git://github.com/ugexe/zef.git"
 
 ## Record our own path.
 P6DIR=`pwd`
@@ -37,6 +39,7 @@ add_path() {
 ## Ensure the proper paths are in place.
 add_paths() {
   add_path "$P6DIR/rakudo/install/bin"
+  add_path "$P6DIR/rakudo/install/share/perl6/site/bin"
   add_path "$P6DIR/rakudo/install/languages/perl6/site/bin"
 }
 
@@ -67,13 +70,31 @@ need_panda() {
   return $NEED_PULL
 }
 
-## Use the 'rebootstrap' script on panda.
-## We no longer use 'bootstrap' at all.
+## Bootstrap panda. 
 bootstrap_panda() {
   NEED_PULL=`need_panda`
   pushd panda
   [ "$NEED_PULL" = "1" ] && git pull
   ./bootstrap.pl
+  popd
+}
+
+## Get zef if we don't have it already.
+need_zef() {
+  NEED_PULL=1
+  if [ ! -d "zef" ]; then 
+    git clone $ZEF_GIT
+    NEED_PULL=0
+  fi
+  return $NEED_PULL
+}
+
+## Bootstrap zef
+bootstrap_zef() {
+  NEED_PULL=`need_zef`
+  pushd zef
+  [ "$NEED_PULL" = "1" ] && git pull
+  perl6 -Ilib bin/zef install .
   popd
 }
 
@@ -87,7 +108,7 @@ Actions:
 
   rakudo       Build/rebuild Rakudo.
   panda        Build/rebuild Panda.
-  all          Build/rebuild Rakudo and Panda.
+  zef          Build/rebuild Zef.
 
 EOF
   exit
@@ -99,12 +120,12 @@ case "$1" in
     build_rakudo
   ;;
   panda)
-    bootstrap_panda
-  ;;
-  all)
-    build_rakudo
     add_paths
     bootstrap_panda
+  ;;
+  zef)
+    add_paths
+    bootstrap_zef
   ;;
   *)
     show_help
