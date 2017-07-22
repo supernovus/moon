@@ -3,7 +3,7 @@
 # Rakudo Moon
 #
 # Build's a bleeding edge version of Rakudo Perl 6 on the MoarVM backend,
-# and choices of the Panda and Zef module installers. 
+# with the Zef package manager.
 #
 # Just call it from the folder you want to build Perl 6 into (called $P6DIR)
 #
@@ -21,7 +21,6 @@
 
 ## The locations of our desired projects.
 RAKUDO_GIT="git://github.com/rakudo/rakudo.git"
-PANDA_GIT="git://github.com/tadzik/panda.git"
 ZEF_GIT="git://github.com/ugexe/zef.git"
 
 ## Record our own path.
@@ -60,25 +59,6 @@ build_rakudo() {
   popd
 }
 
-## Get panda if we don't have it already.
-need_panda() {
-  NEED_PULL=1
-  if [ ! -d "panda" ]; then
-    git clone --recursive $PANDA_GIT panda
-    NEED_PULL=0
-  fi
-  return $NEED_PULL
-}
-
-## Bootstrap panda. 
-bootstrap_panda() {
-  NEED_PULL=`need_panda`
-  pushd panda
-  [ "$NEED_PULL" = "1" ] && git pull
-  ./bootstrap.pl
-  popd
-}
-
 ## Get zef if we don't have it already.
 need_zef() {
   NEED_PULL=1
@@ -107,8 +87,8 @@ usage: '$0' <action>
 Actions:
 
   rakudo       Build/rebuild Rakudo.
-  panda        Build/rebuild Panda.
   zef          Build/rebuild Zef.
+
 
 EOF
   exit
@@ -118,10 +98,6 @@ EOF
 case "$1" in
   rakudo)
     build_rakudo
-  ;;
-  panda)
-    add_paths
-    bootstrap_panda
   ;;
   zef)
     add_paths

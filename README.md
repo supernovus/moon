@@ -3,8 +3,7 @@
 ## Introduction
 
 A simple Bash shell script that builds a bleeding edge copy of
-Rakudo Perl 6 on the MoarVM backend. It also offers a choice between the 
-Panda and Zef package managers (or install both if you want.)
+Rakudo Perl 6 on the MoarVM backend, and the Zef package manager.
 
 ## Synopsis
 
